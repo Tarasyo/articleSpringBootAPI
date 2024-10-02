@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// Don't want to have leaks bettwen the layers so better to have classes in each of the layer if future changes will needed
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
