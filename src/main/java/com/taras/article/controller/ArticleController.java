@@ -45,4 +45,10 @@ public class ArticleController {
     public ResponseEntity<List<Article>> listArticls() {
         return new ResponseEntity<List<Article>>(articleService.listArticls(), HttpStatus.OK);
     }
+
+    @DeleteMapping(path = "/articls/{id}")
+    public ResponseEntity deleteArticle(@PathVariable final String id){
+        articleService.deleteArticleById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

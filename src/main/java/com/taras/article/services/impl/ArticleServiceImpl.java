@@ -4,7 +4,9 @@ import com.taras.article.domain.Article;
 import com.taras.article.domain.ArticleEntity;
 import com.taras.article.repositories.ArticleRepository;
 import com.taras.article.services.ArticleService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleRepository articleRepository;
@@ -48,7 +51,16 @@ public class ArticleServiceImpl implements ArticleService {
         return foundArticls.stream().map(article -> articleEntityToArticle(article)).collect(Collectors.toList());
     }
 
-//    Where the article entity exists it will convert the article entity in to an article,
+    @Override
+    public void deleteArticleById(String id) {
+        try {
+            articleRepository.deleteById(id);
+        }catch (final EmptyResultDataAccessException ex){
+            log.debug("Attemt to delete not existing article", ex);
+        }
+    }
+
+    //    Where the article entity exists it will convert the article entity in to an article,
 //    where it doesn't exist it will be optionally empty
     private ArticleEntity articleToArticleEntity(Article article) {
         return ArticleEntity.builder()

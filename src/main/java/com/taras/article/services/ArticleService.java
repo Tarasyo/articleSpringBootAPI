@@ -13,4 +13,6 @@ public interface ArticleService {
     Optional<Article> findById(String id);
 
     List<Article> listArticls();
+
+    void deleteArticleById(String id);
 }

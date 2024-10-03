@@ -108,4 +108,19 @@ public class ArticleControllerIT {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].volume").value(article.getVolume()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.[0].active").value(article.isActive()));
     }
+
+    @Test
+    public void testThatHttp204IsReturnedWhenArticleDosentExist() throws Exception{
+        mockMvc.perform(MockMvcRequestBuilders.delete("/articls/123123"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @Test
+    public void testThatHttp204IsReturnedWhenExistingArticleIsDeleted() throws Exception{
+        final Article article = TestData.testArticle();
+        articleService.save(article);
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/articls/" + article.getId()))
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 }

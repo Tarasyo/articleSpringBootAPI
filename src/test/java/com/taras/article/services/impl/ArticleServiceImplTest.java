@@ -18,7 +18,7 @@ import static com.taras.article.TestData.testArticleEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -88,6 +88,13 @@ public class ArticleServiceImplTest {
         when(articleRepository.existsById(any())).thenReturn(true);
         final boolean result = underTest.isArticleExists(testArticle());
         assertEquals(true, result);
+    }
+
+    @Test
+    public void testDeleteArticleDeletesArticle() {
+        final String id = "123123";
+        underTest.deleteArticleById(id);
+        verify(articleRepository, times(1)).deleteById(id);
     }
 
 }
