@@ -9,9 +9,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static com.taras.article.TestData.testArticle;
 import static com.taras.article.TestData.testArticleEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +38,56 @@ public class ArticleServiceImplTest {
 
         when(articleRepository.save(eq(articleEntity))).thenReturn(articleEntity);
 
-        final Article result = underTest.create(article);
+        final Article result = underTest.save(article);
         assertEquals(article, result);
     }
+
+    @Test
+    public void testThatFindByIdReturnsEmptyWhenNoArticle() {
+        final String id = "123123";
+        when(articleRepository.findById(eq(id))).thenReturn(Optional.empty());
+        final Optional<Article> result = underTest.findById(id);
+        assertEquals(Optional.empty(), result);
+    }
+
+    @Test
+    public void testThatFindByIdReturnsArticleWhenExists(){
+        final Article article = testArticle();
+        final ArticleEntity articleEntity = testArticleEntity();
+
+        when(articleRepository.findById(eq(article.getId()))).thenReturn(Optional.of(articleEntity));
+
+        final Optional<Article> result = underTest.findById(article.getId());
+        assertEquals(Optional.of(article), result);
+    }
+
+    @Test
+    public void testListArticlsReturnsEmptyListWhenNoArticlsExist() {
+        when(articleRepository.findAll()).thenReturn(new ArrayList<ArticleEntity>());
+        final List<Article> result = underTest.listArticls();
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    public void testListArticlsReturnsEmptyListWhenArticlsExist() {
+        final ArticleEntity articleEntity = testArticleEntity();
+        when(articleRepository.findAll()).thenReturn(List.of(articleEntity));
+        final List<Article> result = underTest.listArticls();
+        assertEquals(1, result.size());
+    }
+
+    @Test
+    public void testArticleExistsReturnFalseWhenArticleDoesntExist() {
+        when(articleRepository.existsById(any())).thenReturn(false);
+        final boolean result = underTest.isArticleExists(testArticle());
+        assertEquals(false, result);
+    }
+
+    @Test
+    public void testArticleExistsReturnTrueWhenArticleDoesExist() {
+        when(articleRepository.existsById(any())).thenReturn(true);
+        final boolean result = underTest.isArticleExists(testArticle());
+        assertEquals(true, result);
+    }
+
 }

@@ -5,11 +5,11 @@ import com.taras.article.services.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+
 
 @RestController
 public class ArticleController {
@@ -21,11 +21,28 @@ public class ArticleController {
         this.articleService = articleService;
     }
 
-    @PutMapping(path = "/articles/{id}")
-    public ResponseEntity<Article> createArticle(@PathVariable final String id, @RequestBody final Article article){
+    @PutMapping(path = "/articls/{id}")
+    public ResponseEntity<Article> createUpdateArticle(@PathVariable final String id, @RequestBody final Article article){
             article.setId(id);
-            final Article savedArticle = articleService.create(article);
-            final ResponseEntity<Article> response = new ResponseEntity<Article>(savedArticle, HttpStatus.CREATED);
-            return response;
+            final boolean isArticleExists = articleService.isArticleExists(article);
+            final Article savedArticle = articleService.save(article);
+
+            if(isArticleExists){
+                return new ResponseEntity<Article>(savedArticle, HttpStatus.OK);
+            }else {
+                return new ResponseEntity<Article>(savedArticle, HttpStatus.CREATED);
+            }
+    }
+
+    @GetMapping(path = "/articls/{id}")
+    public ResponseEntity<Article> retriveArticle(@PathVariable final String id){
+        final Optional<Article> foundArticle = articleService.findById(id);
+        return foundArticle.map(article -> new ResponseEntity<Article>(article, HttpStatus.OK))
+                .orElse(new ResponseEntity<Article>(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(path = "/articls")
+    public ResponseEntity<List<Article>> listArticls() {
+        return new ResponseEntity<List<Article>>(articleService.listArticls(), HttpStatus.OK);
     }
 }

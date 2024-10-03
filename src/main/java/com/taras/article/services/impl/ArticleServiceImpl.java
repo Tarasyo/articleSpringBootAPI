@@ -7,6 +7,10 @@ import com.taras.article.services.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Service
 public class ArticleServiceImpl implements ArticleService {
 
@@ -17,16 +21,35 @@ public class ArticleServiceImpl implements ArticleService {
         this.articleRepository = articleRepository;
     }
 
-    /*
-    In service implemintetion we want to deal just with the article, not to leek the abstraction of entity
-    */
     @Override
-    public Article create(Article article) {
+    public boolean isArticleExists(Article article) {
+        return articleRepository.existsById(article.getId());
+    }
+
+    /*
+        In service implemintetion we want to deal just with the article, not to leek the abstraction of entity
+        */
+    @Override
+    public Article save(Article article) {
         final ArticleEntity articleEntity = articleToArticleEntity(article);
         final ArticleEntity savedArticleEntity = articleRepository.save(articleEntity);
         return articleEntityToArticle(savedArticleEntity);
     }
 
+    @Override
+    public Optional<Article> findById(String id) {
+        final Optional<ArticleEntity> foundArticle = articleRepository.findById(id);
+        return foundArticle.map(article -> articleEntityToArticle(article));
+    }
+
+    @Override
+    public List<Article> listArticls() {
+        final List<ArticleEntity> foundArticls = articleRepository.findAll();
+        return foundArticls.stream().map(article -> articleEntityToArticle(article)).collect(Collectors.toList());
+    }
+
+//    Where the article entity exists it will convert the article entity in to an article,
+//    where it doesn't exist it will be optionally empty
     private ArticleEntity articleToArticleEntity(Article article) {
         return ArticleEntity.builder()
                 .id(article.getId())
